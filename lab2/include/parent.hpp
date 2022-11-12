@@ -3,6 +3,6 @@
 
 #include "utils.hpp"
 
-int Parent(const char* path_to_child, std::istream &in, std::ostream &out);
+int Parent(const char* pathToChild, std::istream &in, std::ostream &out);
 
 #endif

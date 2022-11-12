@@ -4,7 +4,7 @@
 #include "parent.hpp"
 
 
-int Parent(const char *path_to_child, std::istream &in, std::ostream &out) {
+int Parent(const char *pathToChild, std::istream &in, std::ostream &out) {
     int fd[2];
     if (pipe(fd) == -1) {
         std::cout << "Pipe open error" << std::endl;
@@ -21,14 +21,12 @@ int Parent(const char *path_to_child, std::istream &in, std::ostream &out) {
     }
     if (pid == 0) {
         close(fd[0]);
-
-        int descriptor_of_file = open(filename.c_str(), O_RDONLY);
-
-        if (descriptor_of_file == -1) {
+        int descriptorOfFile = open(filename.c_str(), O_RDONLY);
+        if (descriptorOfFile == -1) {
             std::cout << "File open error" << std::endl;
             exit(EXIT_FAILURE);
         }
-        if (dup2(descriptor_of_file, STDIN_FILENO) == -1) {
+        if (dup2(descriptorOfFile, STDIN_FILENO) == -1) {
             std::cout << "Error changing stdin" << std::endl;
             exit(EXIT_FAILURE);
         }
@@ -36,22 +34,22 @@ int Parent(const char *path_to_child, std::istream &in, std::ostream &out) {
             std::cout << "Error changing stdout" << std::endl;
             exit(EXIT_FAILURE);
         }
-        if (execl(path_to_child, "", nullptr) == -1) {
+        if (execl(pathToChild, "", nullptr) == -1) {
             std::cout << "Error executing child process" << std::endl;
             exit(EXIT_FAILURE);
         }
     } else {
         close(fd[1]);
         wait(nullptr);
-        int nums_sum;
+        int NumsSum;
 
         if (dup2(fd[0], STDIN_FILENO) == -1) {
             std::cout << "Error changing stdin" << std::endl;
             exit(EXIT_FAILURE);
         }
 
-        std::cin >> nums_sum;
-        out << nums_sum;
+        std::cin >> NumsSum;
+        out << NumsSum;
 
         close(fd[0]);
     }
