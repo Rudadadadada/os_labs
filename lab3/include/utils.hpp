@@ -6,9 +6,14 @@
 #include <cmath>
 #include <numeric>
 
-std::string intToString(__int128 num);
+namespace gcc_ints {
+    __extension__ typedef __int128 int128;
 
-__int128 hex2dec(std::string hex);
+}
+
+std::string intToString(gcc_ints::int128 num);
+
+gcc_ints::int128 hex2dec(std::string hex);
 
 void *calculateSum(void *numbers);
 

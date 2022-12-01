@@ -1,15 +1,23 @@
 #include "average.hpp"
+#include <chrono>
 
-int Average(const char* Filename, std::istream &ThreadsMemory, std::ostream &out) {
+namespace gcc_ints {
+    __extension__ typedef __int128 int128;
+
+}
+
+int AverageMultiThread(const char* Filename, std::istream &ThreadsMemory, std::ostream &out) {
     std::ifstream file(Filename);
     int threadsLimit;
     int nMemorySize;
 
-    __int128 globalSum = 0;
+    gcc_ints::int128 globalSum = 0;
     std::vector<pthread_t> threads;
 
     ThreadsMemory >> threadsLimit >> nMemorySize;
 
+
+    auto start = std::chrono::high_resolution_clock::now();
     if (nMemorySize < 16)
     {
         std::cout << "Not enough memory to read the 128 bit number" << std::endl;
@@ -17,22 +25,22 @@ int Average(const char* Filename, std::istream &ThreadsMemory, std::ostream &out
     }
 
     nMemorySize /= 16;
-    std::vector<__int128> threadPart;
+    std::vector<gcc_ints::int128> threadPart;
 
     int nNumbers = 0;
     while (!file.eof()) {
 
-        while (!file.eof() && threadPart.size() < nMemorySize) {
+        while (!file.eof() && (int)threadPart.size() < nMemorySize) {
             std::string s;
             file >> s;
             threadPart.push_back(hex2dec(s));
         }
 
-        nNumbers += threadPart.size();
+        nNumbers += (int)threadPart.size();
 
-        if (threads.size() == threadsLimit) {
+        if ((int)threads.size() == threadsLimit) {
             for (pthread_t &thread: threads) {
-                __int128 *sum;
+                gcc_ints::int128 *sum;
                 pthread_join(thread, (void **) &sum);
                 globalSum += *sum;
                 free(sum);
@@ -41,7 +49,7 @@ int Average(const char* Filename, std::istream &ThreadsMemory, std::ostream &out
         }
 
         pthread_t thread;
-        auto *threadPartCopy = new std::vector<__int128>(threadPart);
+        auto *threadPartCopy = new std::vector<gcc_ints::int128>(threadPart);
         pthread_create(&thread, nullptr, calculateSum, threadPartCopy);
         threads.push_back(thread);
 
@@ -49,15 +57,66 @@ int Average(const char* Filename, std::istream &ThreadsMemory, std::ostream &out
     }
 
     for (pthread_t &thread: threads) {
-        __int128 *sum;
+        gcc_ints::int128 *sum;
         pthread_join(thread, (void **) &sum);
         globalSum += *sum;
         free(sum);
     }
 
-    __int128 average = globalSum / nNumbers;
+    gcc_ints::int128 average = globalSum / nNumbers;
     out << intToString(average) << std::endl;
 
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << duration.count() << " microseconds" << std::endl;
     file.close();
-    return EXIT_FAILURE;
+    return 0;
+}
+
+int AverageSingleThread(const char* Filename, std::istream &ThreadsMemory, std::ostream &out)
+{
+    std::ifstream file(Filename);
+    int threadsLimit;
+    int nMemorySize;
+
+    gcc_ints::int128 globalSum = 0;
+    std::vector<pthread_t> threads;
+
+    ThreadsMemory >> threadsLimit >> nMemorySize;
+
+    auto start = std::chrono::high_resolution_clock::now();
+    if (nMemorySize < 16)
+    {
+        std::cout << "Not enough memory to read the 128 bit number" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    nMemorySize /= 16;
+    std::vector<gcc_ints::int128> threadPart;
+
+    int nNumbers = 0;
+    while (!file.eof()) {
+
+        while (!file.eof() && (int)threadPart.size() < nMemorySize) {
+            std::string s;
+            file >> s;
+            threadPart.push_back(hex2dec(s));
+        }
+
+        nNumbers += (int)threadPart.size();
+
+        gcc_ints::int128 sum = std::accumulate(threadPart.begin(), threadPart.end(), (gcc_ints::int128) 0);
+        globalSum += sum;
+
+        threadPart.clear();
+    }
+
+    gcc_ints::int128 average = globalSum / nNumbers;
+    out << intToString(average) << std::endl;
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << duration.count() << " microseconds" << std::endl;
+    file.close();
+    return 0;
 }

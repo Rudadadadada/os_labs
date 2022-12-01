@@ -6,7 +6,10 @@
 #include <fstream>
 #include <vector>
 #include "utils.hpp"
+#include <ctime>
 
-int Average(const char* Filename, std::istream &ThreadsMemory, std::ostream &out);
+int AverageMultiThread(const char* Filename, std::istream &ThreadsMemory, std::ostream &out);
+
+int AverageSingleThread(const char* Filename, std::istream &ThreadsMemory, std::ostream &out);
 
 #endif

@@ -1,6 +1,7 @@
 #include "average.hpp"
 
 int main() {
-    Average("input.txt", std::cin, std::cout);
+    AverageMultiThread("input.txt", std::cin, std::cout);
+    AverageSingleThread("input.txt", std::cin, std::cout);
     return EXIT_FAILURE;
 }

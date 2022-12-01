@@ -76,7 +76,7 @@ TEST(ThirdLabTests, SimpleTest) {
         {
         auto inFile = std::ofstream(fileWithInput);
 
-        for (int i = 0; i < curTest.size() - 1; ++i) {
+        for (int i = 0; i < (int)curTest.size() - 1; ++i) {
             inFile << curTest[i] << '\n';
         }
         inFile << curTest[curTest.size() - 1];
@@ -94,7 +94,7 @@ TEST(ThirdLabTests, SimpleTest) {
         {
             auto inFileTM = std::ifstream(fileWithTM);
             auto outFile = std::ofstream(fileWithOutput);
-            Average(fileWithInput, inFileTM, outFile);
+            AverageSingleThread(fileWithInput, inFileTM, outFile);
         }
 
         auto outFile = std::ifstream(fileWithOutput);

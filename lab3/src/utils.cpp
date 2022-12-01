@@ -1,7 +1,6 @@
 #include "utils.hpp"
 
-
-std::string intToString(__int128 num) {
+std::string intToString(gcc_ints::int128 num) {
     std::string result;
     bool isNegative = false;
     if (num < 0) {
@@ -19,9 +18,9 @@ std::string intToString(__int128 num) {
     return result;
 }
 
-__int128 hex2dec(std::string hex) {
-    __int128 result = 0;
-    for (int i = 0; i < hex.length(); i++) {
+gcc_ints::int128 hex2dec(std::string hex) {
+    gcc_ints::int128 result = 0;
+    for (int i = 0; i < (int)hex.length(); i++) {
         if (hex[i] >= 48 && hex[i] <= 57) {
             result += (hex[i] - 48) * pow(16, hex.length() - i - 1);
         } else if (hex[i] >= 65 && hex[i] <= 70) {
@@ -34,8 +33,8 @@ __int128 hex2dec(std::string hex) {
 }
 
 void *calculateSum(void *numbers) {
-    auto *numbersVector = (std::vector<__int128> *) numbers;
-    auto *sum = new __int128(0);
+    auto *numbersVector = (std::vector<gcc_ints::int128> *) numbers;
+    auto *sum = new gcc_ints::int128(0);
     *sum = std::accumulate(numbersVector->begin(), numbersVector->end(), *sum);
     free(numbers);
     return sum;
